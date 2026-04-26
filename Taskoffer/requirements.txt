@@ -5,5 +5,10 @@ sqlalchemy
 python-dotenv
 psycopg2-binary
 pydantic
-
+pydantic-settings
+python-jose[cryptography]
+python-multipart
+pwdlib[argon2,bcrypt]
+email-validator
+phonenumbers
 

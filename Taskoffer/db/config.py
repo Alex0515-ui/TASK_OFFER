@@ -6,8 +6,10 @@ load_dotenv()
 
 class Settings(BaseSettings):
     DB_URL:str
+    JWT_SECRET_KEY:str
+    ALGORITHM:str
 
-    model = SettingsConfigDict(
+    model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"),
         extra='ignore'
     )

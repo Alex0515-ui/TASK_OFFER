@@ -27,6 +27,18 @@ services:
       - .:/app
     environment:
       DATABASE_URL: ${DB_URL}
+  
+  pgAdmin:
+      image: dpage/pgadmin4
+      container_name: pgdmin_taskOffer
+      restart: always
+      environment:
+        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      ports:
+        - "8081:80"
+      depends_on:
+        - db
 
 volumes:
   postgres_data:
