@@ -1,14 +1,9 @@
-from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pwdlib import PasswordHash
-from fastapi import APIRouter, HTTPException, Depends
-from starlette import status
+from fastapi import Depends
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
-from typing import Annotated
-from entities.user_models import User, Wallet
+from jose import jwt
+from entities.user_models import User
 from db.config import settings
-from entities.schemas import CreateUserSchema, Token
-from db.database import get_db
 from db.config import settings
 
 
@@ -36,6 +31,7 @@ def authenticate_user(email:str, password:str, db):
     
     return user
 
+# Создание токена
 def create_access_token(email:str, user_id:int, expire_time: timedelta):
     encode = {'sub': email, 'id': user_id}
     expires = datetime.now(timezone.utc) + expire_time

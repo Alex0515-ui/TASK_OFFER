@@ -1,15 +1,14 @@
-from fastapi.security import OAuth2AuthorizationCodeBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pwdlib import PasswordHash
+from fastapi.security import OAuth2PasswordBearer
 from fastapi import APIRouter, HTTPException, Depends
 from starlette import status
-from datetime import datetime, timedelta
+from datetime import timedelta
 from jose import jwt, JWTError
 from typing import Annotated
 from sqlalchemy.orm import Session
 
 from entities.user_models import User, Wallet
 from db.config import settings
-from entities.schemas import CreateUserSchema, Token
+from entities.schemas import CreateUserSchema, Token, LoginSchema
 from db.database import get_db
 from auth.auth_methods import *
 
@@ -44,8 +43,8 @@ async def create_user(db: Annotated[Session, Depends(get_db)], create_user_data:
 
 
 @router.post("/token", response_model=Token)
-async def login(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[Session, Depends(get_db)]):
-    user = authenticate_user(email=data.username, password=data.password, db=db)
+async def login(data: LoginSchema, db: Annotated[Session, Depends(get_db)]):
+    user = authenticate_user(email=data.email, password=data.password, db=db)
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Пользователь с такой почтой не существует")

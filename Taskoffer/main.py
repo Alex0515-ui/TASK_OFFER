@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from db.database import Base, engine
 import auth.authentication as authentication
+import Jobs.jobs as job
 from auth.authentication import user_dependency
 
 app = FastAPI()
 app.include_router(authentication.router)
+app.include_router(job.router)
 
 Base.metadata.create_all(bind=engine)
 

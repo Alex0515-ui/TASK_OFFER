@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr, field_validator, Field
-from entities.user_models import Role
+from entities.user_models import Role, Job_type
 import phonenumbers
+from datetime import datetime
+
 
 class CreateUserSchema(BaseModel):
     name: str = Field(min_length=3, max_length=50)
@@ -26,3 +28,18 @@ class CreateUserSchema(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class LoginSchema(BaseModel):
+    email: str
+    password: str
+
+
+class CreateJobSchema(BaseModel):
+    title: str = Field(min_length=5, max_length=200)
+    description: str = Field(min_length=5)
+    price: int 
+    type: Job_type
+    expires_at: datetime
+    deadline: datetime
+
+
