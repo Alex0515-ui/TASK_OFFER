@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from entities.user_models import *
+from entities.models import *
 from entities.schemas import CreateJobSchema
 
 class JobService:

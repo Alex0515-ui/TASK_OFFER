@@ -1,13 +1,15 @@
-from sqlalchemy import func, ForeignKey, Enum as SQLEnum, DateTime
+from sqlalchemy import func, ForeignKey, Enum as SQLEnum, DateTime, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from enum import Enum
 from db.database import Base
 from datetime import datetime
 
+# ДВА ВИДА РОЛИ ПОЛЬЗОВАТЕЛЯ
 class Role(str, Enum):
     CLIENT = "Client"
     WORKER = "Worker"
 
+# ТАБЛИЦА ПОЛЬЗОВАТЕЛЯ
 class User(Base):
     __tablename__ = "users"
 
@@ -32,7 +34,7 @@ class User(Base):
     def __repr__(self):
         return f"{self.name}, {self.role}"
     
-
+# КОШЕЛЕК ПОЛЬЗОВАТЕЛЯ
 class Wallet(Base):
     __tablename__ = "wallets"
 
@@ -48,6 +50,7 @@ class Wallet(Base):
 # ============== JOB модели снизу ====================================
 # =====================================================================
 
+# СТАТУС РАБОТЫ
 class Job_status(Enum):
     IN_SEARCH = "In search"
     PENDING_SELECTION = "Pending selection"
@@ -56,6 +59,7 @@ class Job_status(Enum):
     EXPIRED = "Expired"
     CANCELLED = "Cancelled"
 
+# ТИП РАБОТЫ
 class Job_type(Enum):
     ASSEMBLY = "Сборка" 
     MOUNTING = "Монтаж и установка"
@@ -69,7 +73,14 @@ class Job_type(Enum):
     REPAIR = "Ремонт"
     TECH = "Техника"
 
+# СТАТУС ЗАЯВКИ
+class Response_status(Enum):
+    PENDING = "Pending"
+    ACCEPTED = "Accepted"
+    REJECTED = "Rejected"
 
+
+# ТАБЛИЦА РАБОТЫ
 class Job(Base):
     __tablename__ = "jobs"
 
@@ -95,8 +106,9 @@ class Job(Base):
     
     def __repr__(self):
         return f"{self.title}, {self.price}, {self.status}"
-    
 
+
+# ТАБЛИЦА ЗАЯВКИ НА РАБОТУ
 class JobResponse(Base):
     __tablename__ = "job_responses"
 
@@ -106,10 +118,15 @@ class JobResponse(Base):
 
     offered_price: Mapped[int] = mapped_column(nullable=True)
     cover_letter: Mapped[str] = mapped_column(nullable=True)
+    status: Mapped[Response_status] = mapped_column(SQLEnum(Response_status), default=Response_status.PENDING)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     job: Mapped["Job"] = relationship("Job", back_populates="responses")
     worker: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        UniqueConstraint("job_id", "worker_id", name="uniq_job_worker_response"),
+    )
 
     def __repr__(self):
         return f"Offer from: {self.worker_id}, for job: {self.job_id}"

@@ -3,10 +3,13 @@ from db.database import Base, engine
 import auth.authentication as authentication
 import Jobs.jobs as job
 from auth.authentication import user_dependency
+import Jobs.jobs_responses as job_responses
 
 app = FastAPI()
+
 app.include_router(authentication.router)
 app.include_router(job.router)
+app.include_router(job_responses.router)
 
 Base.metadata.create_all(bind=engine)
 

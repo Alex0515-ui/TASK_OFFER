@@ -6,7 +6,7 @@ from jose import jwt, JWTError
 from typing import Annotated
 from sqlalchemy.orm import Session
 
-from entities.user_models import User, Wallet
+from entities.models import User, Wallet
 from db.config import settings
 from entities.schemas import CreateUserSchema, Token, LoginSchema
 from db.database import get_db
@@ -23,6 +23,14 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 # Регистрация пользователя
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def create_user(db: Annotated[Session, Depends(get_db)], create_user_data: CreateUserSchema):
+    
+    user_exists_email = db.query(User).filter(User.email == create_user_data.email, User.phone_number == create_user_data.phone_number).first()
+    if user_exists_email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Пользователь с такой почтой уже существует')
+        
+    user_exists_phone_number = db.query(User).filter(User.phone_number == create_user_data.phone_number).first()
+    if user_exists_phone_number:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Пользователь с таким номером телефона уже существует')
 
     user = User(
         name=create_user_data.name,

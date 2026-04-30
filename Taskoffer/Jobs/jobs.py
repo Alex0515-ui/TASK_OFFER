@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from Jobs.job_service import JobService
 from auth.authentication import db_dependency, user_dependency
 from entities.schemas import CreateJobSchema
-from entities.user_models import *
+from entities.models import *
 from enum import Enum
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])

@@ -1,15 +1,15 @@
 from pydantic import BaseModel, EmailStr, field_validator, Field
-from entities.user_models import Role, Job_type
+from entities.models import Role, Job_type
 import phonenumbers
 from datetime import datetime
-
+from typing import Optional
 
 class CreateUserSchema(BaseModel):
     name: str = Field(min_length=3, max_length=50)
     email: EmailStr
     password_hash: str
     phone_number: str
-    role: Role = Role.CLIENT
+    role: Optional[Role] = Role.CLIENT
 
     @field_validator('phone_number')
     def validate_phone_number(cls, number:str):
@@ -41,5 +41,13 @@ class CreateJobSchema(BaseModel):
     type: Job_type
     expires_at: datetime
     deadline: datetime
+
+
+
+class CreateJobResponseSchema(BaseModel):
+    job_id: int
+    offered_price: Optional[int] = None
+    cover_letter: Optional[str] = None
+
 
 

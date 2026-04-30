@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 from db.database import Base
-from entities.user_models import User, Wallet
+from entities.models import User, Wallet
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from db.config import settings

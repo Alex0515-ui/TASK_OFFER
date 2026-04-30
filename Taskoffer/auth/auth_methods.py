@@ -2,7 +2,7 @@ from pwdlib import PasswordHash
 from fastapi import Depends
 from datetime import datetime, timedelta, timezone
 from jose import jwt
-from entities.user_models import User
+from entities.models import User
 from db.config import settings
 from db.config import settings
 
