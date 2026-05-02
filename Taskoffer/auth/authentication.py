@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from entities.models import User, Wallet
 from db.config import settings
-from entities.schemas import CreateUserSchema, Token, LoginSchema
+from entities.user_schemas import CreateUserSchema, Token, LoginSchema
 from db.database import get_db
 from auth.auth_methods import *
 

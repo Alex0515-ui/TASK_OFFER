@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from Jobs.job_service import JobService
 from auth.authentication import db_dependency, user_dependency
-from entities.schemas import CreateJobSchema
+from Jobs.job_schemas import CreateJobSchema
 from entities.models import *
 from enum import Enum
 

@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from entities.models import *
-from entities.schemas import CreateJobSchema
+from Jobs.job_schemas import CreateJobSchema
 
 class JobService:
 
@@ -9,7 +9,7 @@ class JobService:
     @staticmethod
     def create_job(job_data: CreateJobSchema,  owner_id: int, db: Session):
         job = Job(**job_data.model_dump(), owner_id = owner_id)
-
+        
         db.add(job)
         db.commit()
         db.refresh(job)

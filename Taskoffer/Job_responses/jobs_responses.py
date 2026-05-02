@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from auth.authentication import db_dependency, user_dependency
-from entities.schemas import CreateJobResponseSchema
-from Jobs.job_responses_service import JobResponseService
+from Job_responses.job_response_schema import CreateJobResponseSchema
+from Job_responses.job_responses_service import JobResponseService
 from entities.models import *
 
 

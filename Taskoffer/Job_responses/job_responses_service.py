@@ -1,7 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from entities.models import *
-from entities.schemas import CreateJobResponseSchema
+from Job_responses.job_response_schema import CreateJobResponseSchema
+from sqlalchemy import select
+from Deals.deals_service import DealService
 
 class JobResponseService:
 
@@ -35,25 +37,42 @@ class JobResponseService:
     # Принятие заявки
     @staticmethod
     def accept_response(db: Session, response_id: int, client_id: int):
-        response = db.query(JobResponse).filter(JobResponse.id == response_id).first()
-        if not response:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Заявка не найдена')
+            
+        try:
+            response = db.execute(select(JobResponse).where(JobResponse.id == response_id).with_for_update()).scalar_one_or_none()
+            if not response:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Заявка не найдена')
+            
+            job = db.execute(select(Job).where(Job.id == response.job.id).with_for_update()).scalar_one()
+
+            if not job:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Работа не найдена')
+            
+            if job.owner_id != client_id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Нельзя принять заявку на чужую работу')
+            
+            if job.worker_id is not None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Работник уже найден')
+            
+            job.worker_id = response.worker_id
+            job.status = Job_status.ACCEPTED
+            response.status = Response_status.ACCEPTED
+
+            # Отклоняем других кандидатов
+            db.query(JobResponse).filter(
+                JobResponse.job_id == job.id, 
+                JobResponse.id != response.id
+            ).update({"status": Response_status.REJECTED})
+
+            DealService.createDeal(job=job, job_response=response, db=db)
+
+            db.commit()
+
+            return {"message": "Работник назначен, теперь работа начнется!"}
         
-        if response.job.owner_id != client_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Нельзя принять заявку на чужую работу')
-        
-        response.status = Response_status.ACCEPTED
-        response.job.status = Job_status.ACCEPTED
-        response.job.worker_id = response.worker_id
-
-        db.query(JobResponse).filter(               # Отклоняем другие заявки
-            JobResponse.job_id == response.job.id, 
-            JobResponse.id != response_id
-        ).update({'status': Response_status.REJECTED})
-
-        db.commit()
-
-        return {"message": "Работник назначен, теперь работа начнется!"}
+        except:
+            db.rollback()
+            raise
 
 
 
