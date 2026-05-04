@@ -7,9 +7,9 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 
 from entities.models import User, Wallet
-from db.config import settings
+from config.configuration import settings
 from entities.user_schemas import CreateUserSchema, Token, LoginSchema
-from db.database import get_db
+from config.database import get_db
 from auth.auth_methods import *
 
 router = APIRouter(prefix="/auth", tags=['auth'])
@@ -78,3 +78,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
+
+# Получение своего профиля и данных
+@router.get("/me")
+def get_myself(user: user_dependency, db: db_dependency):
+    return get_me(user_id=user['id'], db=db)

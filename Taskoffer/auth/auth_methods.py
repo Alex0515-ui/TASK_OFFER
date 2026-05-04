@@ -3,9 +3,9 @@ from fastapi import Depends
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 from entities.models import User
-from db.config import settings
-from db.config import settings
-
+from config.configuration import settings
+from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 
 # Метод для хэширования паролей
 password_verify = PasswordHash.recommended()
@@ -37,3 +37,20 @@ def create_access_token(email:str, user_id:int, expire_time: timedelta):
     expires = datetime.now(timezone.utc) + expire_time
     encode.update({'exp': expires})
     return jwt.encode(encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM)
+
+# Получение своего профиля
+def get_me(user_id: int, db: Session):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Пользователь не найден')
+    return {
+        "id" : user.id,
+        "name" : user.name,
+        "email" : user.email,
+        "phone_number" : user.phone_number,
+        "role" : user.role,
+        "rating" : user.rating,
+        "completed_tasks" : user.completed_task,
+        "registered_at": user.created_at
+
+    }

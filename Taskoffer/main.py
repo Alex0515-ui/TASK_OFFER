@@ -1,16 +1,19 @@
 from fastapi import FastAPI, HTTPException
-from db.database import Base, engine
+from config.database import Base, engine
 import auth.authentication as authentication
 import Jobs.jobs as job
 from auth.authentication import user_dependency
 import Job_responses.jobs_responses as job_responses
 import Deals.deals as deals
+import Reviews.reviews as reviews
+
 app = FastAPI()
 
 app.include_router(authentication.router)
 app.include_router(job.router)
 app.include_router(job_responses.router)
 app.include_router(deals.router)
+app.include_router(reviews.router)
 
 Base.metadata.create_all(bind=engine)
 
