@@ -100,10 +100,10 @@ class Job(Base):
     worker : Mapped["User"] = relationship("User", foreign_keys=[worker_id], back_populates="tasks_assigned")
 
 
-    status : Mapped[Job_status] = mapped_column(SQLEnum(Job_status), default=Job_status.IN_SEARCH)
+    status : Mapped[Job_status] = mapped_column(SQLEnum(Job_status), default=Job_status.IN_SEARCH, index=True)
     type : Mapped[Job_type] = mapped_column(SQLEnum(Job_type), nullable=False)
     created_at : Mapped[datetime] = mapped_column(server_default=func.now())
-    expires_at : Mapped[datetime] = mapped_column(nullable=False)
+    expires_at : Mapped[datetime] = mapped_column(nullable=False, index=True)
     deadline : Mapped[datetime] = mapped_column(DateTime)
 
     responses : Mapped[list["JobResponse"]] = relationship("JobResponse", back_populates="job", cascade="all, delete-orphan")

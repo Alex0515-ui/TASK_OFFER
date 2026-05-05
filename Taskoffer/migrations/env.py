@@ -1,9 +1,9 @@
 from logging.config import fileConfig
-from db.database import Base
+from config.database import Base
 from entities.models import User, Wallet
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from db.config import settings
+from config.configuration import settings
 from alembic import context
 
 # this is the Alembic Config object, which provides
